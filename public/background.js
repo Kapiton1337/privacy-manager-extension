@@ -83,3 +83,50 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
+let isBlockingEnabled = false;
+const maliciousUrls = [
+    "google\\.com",
+    // Добавьте другие вредоносные URL сюда
+];
+
+// Функция для проверки URL на вредоносность
+function isMaliciousUrl(url) {
+    return maliciousUrls.some(maliciousUrlPattern => {
+        const regex = new RegExp(maliciousUrlPattern, 'i'); // 'i' для нечувствительности к регистру
+        return regex.test(url);
+    });
+}
+
+// Слушатель запросов
+chrome.webRequest.onBeforeRequest.addListener(
+    function(details) {
+        if (isBlockingEnabled && isMaliciousUrl(details.url)) {
+            console.log(`Blocked malicious request to: ${details.url}`);
+            return {cancel: true};
+        }
+    },
+    {urls: ["<all_urls>"]}, // Фильтр для всех URL.
+    ["blocking"]
+);
+
+// Слушатель сообщений от компонентов расширения
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.action === "toggleBlocking") {
+        isBlockingEnabled = request.state;
+        console.log(`Blocking is now ${isBlockingEnabled ? 'enabled' : 'disabled'}.`);
+
+        // Сохраняем новое состояние блокировки
+        chrome.storage.sync.set({isBlockingEnabled: isBlockingEnabled});
+
+        sendResponse({status: 'success', isBlockingEnabled: isBlockingEnabled});
+    }
+    return true;
+});
+
+// При запуске расширения загружаем сохраненное состояние блокировки
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.storage.sync.get(['isBlockingEnabled'], function(result) {
+        isBlockingEnabled = result.isBlockingEnabled || false;
+        console.log(`Blocking is initially ${isBlockingEnabled ? 'enabled' : 'disabled'}.`);
+    });
+});

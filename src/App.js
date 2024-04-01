@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import ProxySettings from "./Components/ProxySettings";
 import './App.css';
+import Blocker from "./Components/Blocker";
 
 function App() {
     const [cookies, setCookies] = useState([]);
@@ -54,6 +55,7 @@ function App() {
     return (
         <div className="App">
             <ProxySettings />
+            <Blocker />
             <h1>Cookies List</h1>
             {/* Интерфейс для поиска и удаления кук */}
             {editingCookie && (
