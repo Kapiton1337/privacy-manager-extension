@@ -130,3 +130,27 @@ chrome.runtime.onInstalled.addListener(() => {
         console.log(`Blocking is initially ${isBlockingEnabled ? 'enabled' : 'disabled'}.`);
     });
 });
+
+let currentUserAgent = "default"; // Глобальная переменная для хранения User-Agent
+
+// Функция для асинхронного обновления User-Agent
+async function updateUserAgent() {
+    const result = await new Promise(resolve => chrome.storage.sync.get(['userAgent'], resolve));
+    currentUserAgent = result.userAgent || "default";
+}
+
+// Вызовите эту функцию при старте расширения и при каждом изменении User-Agent
+updateUserAgent();
+
+chrome.webRequest.onBeforeSendHeaders.addListener(
+    (details) => {
+        // Используйте кэшированный User-Agent
+        const requestHeaders = details.requestHeaders.filter(header => header.name.toLowerCase() !== 'user-agent');
+        requestHeaders.push({name: "User-Agent", value: currentUserAgent});
+
+        return {requestHeaders};
+    },
+    {urls: ["<all_urls>"]},
+    ["blocking", "requestHeaders"]
+);
+
