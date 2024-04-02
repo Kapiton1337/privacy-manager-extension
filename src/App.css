@@ -1,27 +1,81 @@
 .App {
-  text-align: center;
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+.tabs {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
 }
 
-li {
-  background-color: #eaeaea;
-  margin: 10px 0;
+.tabs button {
+  flex-grow: 1;
   padding: 10px;
+  cursor: pointer;
+  background-color: #4a4a4a; /* Более темный фон для кнопок */
+  color: #ffffff; /* Светлый текст для контраста */
+  border: none;
+  border-bottom: 3px solid transparent;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.tabs button:hover {
+  background-color: #5a5a5a; /* Чуть светлее при наведении */
+}
+
+.tabs button.active {
+  border-bottom-color: #007bff; /* Синяя полоса для активной вкладки */
+  background-color: #5a5a5a; /* Чуть светлее фон для активной вкладки */
+}
+
+.content {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #ddd;
   border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Дополнительные стили для элементов внутри вкладок, если нужно */
+input[type="text"], input[type="password"], select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 20px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #007bff;
+  width: 100%;
+  background-color: #4CAF50;
   color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Стилизация ошибок и сообщений */
+.error-message, .success-message {
+  color: #d8000c;
+  background-color: #ffbaba;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  color: #4F8A10;
+  background-color: #DFF2BF;
 }
