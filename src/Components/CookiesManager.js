@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 function CookiesManager({ domainPattern }) {
     const [cookies, setCookies] = useState([]);
     const [editingCookie, setEditingCookie] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchCookies();
-    }, [domainPattern]); // Перезагрузка при изменении domainPattern
+    }, [domainPattern]);
 
     const fetchCookies = () => {
         chrome.runtime.sendMessage({action: "getCookies", domainPattern}, (response) => {
@@ -26,8 +27,8 @@ function CookiesManager({ domainPattern }) {
         chrome.runtime.sendMessage({action: "deleteCookie", name: cookie.name, url: url}, fetchCookies);
     };
 
-    const deleteAllCookies = () => {
-        chrome.runtime.sendMessage({action: "deleteAllCookies", domainPattern}, fetchCookies);
+    const deleteAllCookiesBySearch = () => {
+        chrome.runtime.sendMessage({action: "deleteAllCookies", domainPattern: searchQuery}, fetchCookies);
     };
 
     const editCookie = (cookie) => {
@@ -39,22 +40,38 @@ function CookiesManager({ domainPattern }) {
     };
 
     const saveCookie = () => {
+        const cookieData = {
+            ...editingCookie,
+            url: `http${editingCookie.secure ? 's' : ''}://${editingCookie.domain}${editingCookie.path}`,
+            secure: editingCookie.secure,
+            httpOnly: editingCookie.httpOnly
+        };
+
+        console.log("Saving cookie:", cookieData);
+
         chrome.runtime.sendMessage({
             action: "editCookie",
-            ...editingCookie,
-            url: `http${editingCookie.secure ? 's' : ''}://${editingCookie.domain}${editingCookie.path}`
+            ...cookieData
         }, response => {
+            console.log("Response:", response);
             if (response.status === "success") {
-                setEditingCookie(null); // Скрываем форму редактирования
-                fetchCookies(); // Обновляем список кук
+                setEditingCookie(null);
+                fetchCookies();
             }
         });
     };
 
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const filteredCookies = cookies.filter(cookie => cookie.domain.toLowerCase().includes(searchQuery.toLowerCase()));
+
     return (
         <div>
             <h1>Cookies List</h1>
-            {/* Интерфейс для поиска и удаления кук */}
+            <input type="text" placeholder="Search by domain..." value={searchQuery} onChange={handleSearchChange} />
+            <button onClick={deleteAllCookiesBySearch}>Delete All By Search</button>
             {editingCookie && (
                 <div>
                     <h2>Editing Cookie: {editingCookie.name}</h2>
@@ -63,9 +80,9 @@ function CookiesManager({ domainPattern }) {
                 </div>
             )}
             <ul>
-                {cookies.map((cookie, index) => (
+                {filteredCookies.map((cookie, index) => (
                     <li key={index}>
-                        {cookie.name}: {cookie.value}
+                        {cookie.name}: {cookie.value} ({cookie.domain})
                         <button onClick={() => editCookie(cookie)}>Edit</button>
                         <button onClick={() => deleteCookie(cookie)}>Delete</button>
                     </li>

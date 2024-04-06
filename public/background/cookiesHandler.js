@@ -21,9 +21,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
         return true;
     } else if (request.action === "editCookie") {
-        chrome.cookies.set({...request, url: request.url}, function (cookie) {
-            sendResponse({status: "success", cookie: cookie});
+        // Создаем новый объект details для chrome.cookies.set,
+        // копируем в него все свойства из request, кроме action.
+        const cookieDetails = {
+            url: request.url,
+            name: request.name,
+            value: request.value,
+            domain: request.domain,
+            path: request.path,
+            secure: request.secure,
+            httpOnly: request.httpOnly, // Если это свойство используется
+            expirationDate: request.expirationDate, // Если это свойство используется
+            // Добавьте другие свойства, используемые вашим расширением
+        };
+
+        chrome.cookies.set(cookieDetails, function(cookie) {
+            if (chrome.runtime.lastError) {
+                console.error(chrome.runtime.lastError);
+                sendResponse({status: "error", message: chrome.runtime.lastError.message});
+            } else {
+                sendResponse({status: "success", cookie: cookie});
+            }
         });
-        return true;
+        return true; // Чтобы ответ мог быть асинхронным.
     }
 });
