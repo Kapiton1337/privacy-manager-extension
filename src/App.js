@@ -5,6 +5,8 @@ import Blocker from "./Components/Blocker";
 import UserAgentSetter from "./Components/UserAgentSetter";
 import CookiesManager from "./Components/CookiesManager";
 import CanvasDefenderToggle from "./Components/CanvasDefenderToggle";
+import PersonalInfoScanner from "./Components/PersonalInfo";
+import EtagToggle from "./Components/EtagToggle"; // Импортируем новый компонент
 
 function App() {
     const [activeTab, setActiveTab] = useState('proxy');
@@ -21,6 +23,10 @@ function App() {
                 return <CookiesManager domainPattern="" />;
             case 'canvas':
                 return <CanvasDefenderToggle />;
+            case 'personalInfo':
+                return <PersonalInfoScanner />;
+            case 'etag':
+                return <EtagToggle />;
             default:
                 return <div>Select a tab</div>;
         }
@@ -34,6 +40,8 @@ function App() {
                 <button onClick={() => setActiveTab('userAgent')}>User Agent Setter</button>
                 <button onClick={() => setActiveTab('cookies')}>Cookies Manager</button>
                 <button onClick={() => setActiveTab('canvas')}>Canvas Defender</button>
+                <button onClick={() => setActiveTab('personalInfo')}>Personal Info Scanner</button>
+                <button onClick={() => setActiveTab('etag')}>Etag defender</button>
             </div>
             <div className="content">
                 {renderActiveTab()}

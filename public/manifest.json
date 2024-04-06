@@ -17,17 +17,25 @@
   ],
   "background": {
     "scripts": [
+      "background/webglHandler.js",
       "background/cookiesHandler.js",
-      "background/proxyHandler.js",
       "background/maliciousRequestBlocker.js",
-      "background/userAgentHandler.js"
+      "background/personalInfoHandler.js",
+      "background/proxyHandler.js",
+      "background/userAgentHandler.js",
+      "background/etagHandler.js"
     ],
     "persistent": true
   },
   "content_scripts": [
     {
+      "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["scripts/canvasDefender.js"],
+      "js": [
+        "scripts/webglDefender.js",
+        "scripts/PersonalInfoScanner.js"
+      ],
+      "match_about_blank": true,
       "run_at": "document_start"
     }
   ],
