@@ -1,20 +1,45 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Cookies List",
   "version": "1.0",
   "description": "View all your cookies",
-  "host_permissions": [
-    "*://*/*"
-  ],
   "permissions": [
     "cookies",
     "proxy",
-    "storage"
+    "storage",
+    "webRequest",
+    "*://*/*",
+    "webRequestBlocking",
+    "tabs",
+    "notifications",
+    "webNavigation",
+    "<all_urls>"
   ],
-  "action": {
-    "default_popup": "index.html"
-  },
   "background": {
-    "service_worker": "background.js"
+    "scripts": [
+      "background/webglHandler.js",
+      "background/cookiesHandler.js",
+      "background/maliciousRequestBlocker.js",
+      "background/personalInfoHandler.js",
+      "background/proxyHandler.js",
+      "background/userAgentHandler.js",
+      "background/etagHandler.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "matches": ["<all_urls>"],
+      "js": [
+        "scripts/webglDefender.js",
+        "scripts/PersonalInfoScanner.js"
+      ],
+      "match_about_blank": true,
+      "run_at": "document_start"
+    }
+  ],
+  "browser_action": {
+    "default_popup": "index.html"
   }
 }
